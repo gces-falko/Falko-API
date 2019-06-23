@@ -19,26 +19,20 @@ class StoriesController < ApplicationController
     render json: @stories
   end
 
-  def to_do_list
-    @sprint = Sprint.find(params[:id])
-
-    @stories = @sprint.stories.select { |story| story.pipeline == "To Do" }
+  def to_do_list 
+    @stories = create_kanban_list(:id, "To Do")
 
     render json: format_json_output(@stories)
   end
 
   def doing_list
-    @sprint = Sprint.find(params[:id])
-
-    @stories = @sprint.stories.select { |story| story.pipeline == "Doing" }
+    @stories = create_kanban_list(:id, "Doing")
 
     render json: format_json_output(@stories)
   end
 
   def done_list
-    @sprint = Sprint.find(params[:id])
-
-    @stories = @sprint.stories.select { |story| story.pipeline == "Done" }
+    @stories = create_kanban_list(:id, "Done")
 
     render json: format_json_output(@stories)
   end
@@ -60,7 +54,7 @@ class StoriesController < ApplicationController
     else
       render json: { error: "Story points have to be set" }, status: :unprocessable_entity
     end
-    end
+  end
 
   def update
     if story_params[:pipeline] == "Done"
@@ -88,10 +82,26 @@ class StoriesController < ApplicationController
       if stories != nil
         if stories.kind_of?(Array)
           stories.each do |story|
-            form_params[:stories_infos].push(name: story.name, description: story.description, assign: story.assign, pipeline: story.pipeline, initial_date: story.initial_date, story_points: story.story_points, final_date: story.final_date, issue_number: story.issue_number, id: story.id)
+            form_params[:stories_infos].push(name: story.name,
+                                             description: story.description,
+                                             assign: story.assign,
+                                             pipeline: story.pipeline,
+                                             initial_date: story.initial_date,
+                                             story_points: story.story_points,
+                                             final_date: story.final_date,
+                                             issue_number: story.issue_number,
+                                             id: story.id)
           end
         else
-          form_params[:stories_infos].push(name: stories.name, description: stories.description, assign: stories.assign, pipeline: stories.pipeline, initial_date: stories.initial_date, story_points: stories.story_points, final_date: stories.final_date, issue_number: stories.issue_number, id: stories.id)
+          form_params[:stories_infos].push(name: stories.name,
+                                           description: stories.description,
+                                           assign: stories.assign,
+                                           pipeline: stories.pipeline,
+                                           initial_date: stories.initial_date,
+                                           story_points: stories.story_points,
+                                           final_date: stories.final_date,
+                                           issue_number: stories.issue_number,
+                                           id: stories.id)
         end
       end
 
@@ -99,6 +109,21 @@ class StoriesController < ApplicationController
     end
 
     def story_params
-      params.require(:story).permit(:name, :description, :assign, :pipeline, :initial_date, :story_points, :final_date, :issue_number, :issue_id)
+      params.require(:story).permit(:name,
+                                    :description,
+                                    :assign,
+                                    :pipeline,
+                                    :initial_date,
+                                    :story_points,
+                                    :final_date,
+                                    :issue_number,
+                                    :issue_id)
+    end
+
+    def create_kanban_list(id, pipeline_status)
+      @sprint = Sprint.find(params[:id])
+      @stories = @sprint.stories.select { |story| story.pipeline == pipeline_status }
+
+      return @stories
     end
 end
