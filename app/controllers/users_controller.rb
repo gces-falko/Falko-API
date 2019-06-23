@@ -34,26 +34,11 @@ class UsersController < ApplicationController
   def request_github_token
     code_token = params[:code]
 
-    result = RestClient.post(
-      "https://github.com/login/oauth/access_token",
-      client_id: ENV["CLIENT_ID"],
-      client_secret: ENV["CLIENT_SECRET"],
-      code: code_token,
-      accept: :json
-    )
-
-
+    result = get_token(code_token)
     access_token = result.split("&")[0].split("=")[1]
 
     unless access_token == "bad_verification_code" || access_token == nil
-      @user = User.find(params[:id])
-      @user.access_token = access_token
-
-      if @user.update_column(:access_token, access_token)
-        render json: @user
-      else
-        render json: @user.errors, status: :unprocessable_entity
-      end
+      put_token_for_user(access_token)
     else
       render json: result, status: :bad_request
     end
@@ -91,5 +76,28 @@ class UsersController < ApplicationController
 
     def user_params
       params.require(:user).permit(:name, :email, :password, :password_confirmation)
+    end
+
+    def get_token(code_token)
+      result = RestClient.post(
+        "https://github.com/login/oauth/access_token",
+        client_id: ENV["CLIENT_ID"],
+        client_secret: ENV["CLIENT_SECRET"],
+        code: code_token,
+        accept: :json
+      )
+      
+      return result
+    end
+
+    def put_token_for_user(access_token)
+      @user = User.find(params[:id])
+      @user.access_token = access_token
+
+      if @user.update_column(:access_token, access_token)
+        render json: @user
+      else
+        render json: @user.errors, status: :unprocessable_entity
+      end
     end
 end
