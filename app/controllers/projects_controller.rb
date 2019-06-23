@@ -22,32 +22,11 @@ class ProjectsController < ApplicationController
   def github_projects_list
     client = Adapter::GitHubProject.new(request)
 
-    user_login = client.get_github_user
+    @form_user_params = get_user_params(client)
+    @form_orgs_params = get_orgs_params(client)
+    @form_user_and_orgs_params = @form_orgs_params.merge(@form_user_params)
 
-    @form_params_user = { user: [] }
-    @form_params_user[:user].push(login: user_login)
-
-    user_repos = []
-
-    (client.get_github_repos(user_login)).each do |repo|
-      user_repos.push(repo.name)
-    end
-
-    @form_params_user[:user].push(repos: user_repos)
-
-    @form_params_orgs = { orgs: [] }
-
-    (client.get_github_orgs(user_login)).each do |org|
-      repos_names = []
-      (client.get_github_orgs_repos(org)).each do |repo|
-        repos_names.push(repo.name)
-      end
-      @form_params_orgs[:orgs].push(name: org.login, repos: repos_names)
-    end
-
-    @form_params_user_orgs = @form_params_orgs.merge(@form_params_user)
-
-    render json: @form_params_user_orgs
+    render json: @form_user_and_orgs_params
   end
 
   def show
@@ -99,6 +78,44 @@ class ProjectsController < ApplicationController
     end
 
     def project_params
-      params.require(:project).permit(:name, :description, :user_id, :is_project_from_github, :github_slug, :is_scoring)
+      params.require(:project).permit(:name,
+                                      :description,
+                                      :user_id,
+                                      :is_project_from_github,
+                                      :github_slug,
+                                      :is_scoring)
+    end
+
+    def get_user_params(client)
+      user_login = client.get_github_user
+
+      user_params = { user: [] }
+      user_params[:user].push(login: user_login)
+
+      user_repos = []
+
+      (client.get_github_repos(user_login)).each do |repo|
+        user_repos.push(repo.name)
+      end
+
+      user_params[:user].push(repos: user_repos)
+
+      return user_params
+    end
+
+    def get_orgs_params(client)
+      user_login = client.get_github_user
+
+      orgs_params = { orgs: [] }
+
+      (client.get_github_orgs(user_login)).each do |org|
+        repos_names = []
+        (client.get_github_orgs_repos(org)).each do |repo|
+          repos_names.push(repo.name)
+        end
+        orgs_params[:orgs].push(name: org.login, repos: repos_names)
+      end
+
+      return orgs_params
     end
 end
