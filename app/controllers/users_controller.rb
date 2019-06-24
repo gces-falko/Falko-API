@@ -7,7 +7,7 @@ class UsersController < ApplicationController
 
   before_action only: [:show, :update, :destroy] do
     set_user
-    validate_user(:id, 0)
+    validate_user(params[:id])
   end
 
   # GET /users/1

@@ -8,11 +8,11 @@ class SprintsController < ApplicationController
   before_action :set_sprint, only: [:show, :update, :destroy, :get_burndown]
 
   before_action only: [:index, :create] do
-    validate_release(0, :release_id)
+    validate_release(params[:release_id])
   end
 
   before_action only: [:show, :update, :destroy, :get_velocity, :get_metrics] do
-    validate_sprint(:id, 0)
+    validate_sprint(params[:id])
   end
 
   def index
@@ -26,7 +26,7 @@ class SprintsController < ApplicationController
 
   def create
     @sprint = Sprint.new(sprint_params)
-    if validate_sprints_date("sprint", sprint_params)
+    if validate_sprints_date
       @sprint.release = @release
       update_amount_of_sprints
       if @sprint.save
@@ -42,7 +42,7 @@ class SprintsController < ApplicationController
   end
 
   def update
-    if validate_sprints_date("sprint", sprint_params)
+    if validate_sprints_date
       if @sprint.update(sprint_params)
         render json: @sprint
       else
