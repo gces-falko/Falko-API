@@ -105,15 +105,6 @@ module MetricHelper
     return Float values / metric_burndown_array.length
   end
 
-  def calculate_metric_burndown_array(date_axis, points_axis, ideal_burned_points)
-    for i in 0..(date_axis.length - 2)
-      real_burned_points = points_axis[i] - points_axis[i + 1]
-      burned_percentage = Float((real_burned_points).abs * 100) / ideal_burned_points
-      metric_burndown_array.push(burned_percentage)
-    end
-    return metric_burndown_array
-  end
-
   def calculate_metric_velocity_value(amount_of_sprints, total_sprints_points, velocities, total_points)
     metric_velocity_value = 0
     for i in 0..(amount_of_sprints - 1)
