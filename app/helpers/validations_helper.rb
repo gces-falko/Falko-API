@@ -12,7 +12,7 @@ module ValidationsHelper
   def get_sprint_release
     @release = Release.find(@sprint.release_id)
   end
-  
+
   def get_story_sprint
     @sprint = Sprint.find(@story.sprint_id)
   end
@@ -101,21 +101,21 @@ module ValidationsHelper
   def validate_sprint_story(story_id)
     get_story(story_id)
     get_story_sprint
-    
+
     validate_sprint_dependencies
   end
 
   def validate_sprint_revision(revision_id)
     get_revision(revision_id)
     get_revision_sprint
-    
+
     validate_sprint_dependencies
   end
 
   def validate_sprint_retrospective(retrospective_id)
     get_retrospective(retrospective_id)
     get_retrospective_sprint
-    
+
     validate_sprint_dependencies
   end
 
