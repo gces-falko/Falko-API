@@ -86,7 +86,7 @@ class UsersController < ApplicationController
         code: code_token,
         accept: :json
       )
-      
+
       return result
     end
 

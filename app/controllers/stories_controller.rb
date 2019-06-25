@@ -19,7 +19,7 @@ class StoriesController < ApplicationController
     render json: @stories
   end
 
-  def to_do_list 
+  def to_do_list
     @stories = create_kanban_list(:id, "To Do")
 
     render json: format_json_output(@stories)
