@@ -5,11 +5,11 @@ class RetrospectivesController < ApplicationController
   before_action :set_retrospective, only: [:show, :update, :destroy]
 
   before_action only: [:index, :create] do
-    validate_sprint(0, :sprint_id)
+    validate_sprint(params[:sprint_id])
   end
 
   before_action only: [:show, :update, :destroy] do
-    validate_sprint_dependencies(:id, "retrospective")
+    validate_sprint_retrospective(params[:id])
   end
 
 
@@ -23,8 +23,22 @@ class RetrospectivesController < ApplicationController
     render json: @retrospective
   end
 
+  def save_retrospective
+    @retrospective.sprint_id = @sprint.id
+    if @retrospective.save
+      render json: @retrospective, status: :created
+    else
+      render json: @retrospective.errors, status: :unprocessable_entity
+    end
+  end
+
   def create
-    create_sprint_dependencies("retrospective", retrospective_params)
+    if @sprint.retrospective.nil?
+      @retrospective = Retrospective.create(retrospective_params)
+      save_retrospective
+    else
+      render json: { error: "Cannot create multiple retrospectives" }, status: 403
+    end
   end
 
   def show

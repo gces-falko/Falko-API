@@ -2,16 +2,17 @@ require "rest-client"
 
 class ProjectsController < ApplicationController
   include ValidationsHelper
+  include UserValidationHelper
   include ProjectsDoc
 
   before_action :set_project, only: [:destroy, :show, :get_contributors]
 
   before_action only: [:index, :create] do
-    validate_user(0, :user_id)
+    validate_user(params[:user_id])
   end
 
   before_action only: [:show, :update, :destroy] do
-    validate_project(:id, 0)
+    validate_project(params[:id])
   end
 
   def index

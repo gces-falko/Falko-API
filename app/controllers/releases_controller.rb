@@ -5,11 +5,11 @@ class ReleasesController < ApplicationController
   before_action :set_release, only: [:show, :update, :destroy]
 
   before_action only: [:index, :create] do
-    validate_project(0, :project_id)
+    validate_project(params[:project_id])
   end
 
   before_action only: [:show, :edit, :update, :destroy] do
-    validate_release(:id, 0)
+    validate_release(params[:id])
   end
 
   def index

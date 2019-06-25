@@ -1,13 +1,13 @@
 require "rest-client"
 class UsersController < ApplicationController
-  include ValidationsHelper
+  include UserValidationHelper
   include UsersDoc
 
   skip_before_action :authenticate_request, only: [:create, :all]
 
   before_action only: [:show, :update, :destroy] do
     set_user
-    validate_user(:id, 0)
+    validate_user(params[:id])
   end
 
   # GET /users/1

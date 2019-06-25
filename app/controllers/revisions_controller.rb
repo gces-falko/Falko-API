@@ -5,11 +5,11 @@ class RevisionsController < ApplicationController
   before_action :set_revision, only: [:show, :update]
 
   before_action only: [:index, :create] do
-    validate_sprint(0, :sprint_id)
+    validate_sprint(params[:sprint_id])
   end
 
   before_action only: [:show, :update, :destroy] do
-    validate_sprint_dependencies(:id, "revision")
+    validate_sprint_revision(params[:id])
   end
 
   def index
@@ -17,8 +17,22 @@ class RevisionsController < ApplicationController
     render json: @revision
   end
 
+  def save_revision
+    @revision.sprint_id = @sprint.id
+    if @revision.save
+      render json: @revision, status: :created
+    else
+      render json: @revision.errors, status: :unprocessable_entity
+    end
+  end
+
   def create
-    create_sprint_dependencies("revision", revision_params)
+    if @sprint.revision.nil?
+      @revision = Revision.create(revision_params)
+      save_revision
+    else
+      render json: { error: "Cannot create multiple revisions" }, status: 403
+    end
   end
 
   def show
