@@ -58,7 +58,7 @@ module ValidationsHelper
     get_project(project_id)
     get_project_user
 
-    validate_authorization
+    validate_user_authorization
   end
 
   def validate_grade(grade_id)
@@ -67,7 +67,7 @@ module ValidationsHelper
     get_grade_project
     get_project_user
 
-    validate_authorization
+    validate_user_authorization
   end
 
   def validate_release(release_id)
@@ -76,7 +76,7 @@ module ValidationsHelper
     get_release_project
     get_project_user
 
-    validate_authorization
+    validate_user_authorization
   end
 
   def validate_sprint(sprint_id)
@@ -86,7 +86,7 @@ module ValidationsHelper
     get_release_project
     get_project_user
 
-    validate_authorization
+    validate_user_authorization
   end
 
   def validate_sprint_dependencies
@@ -95,7 +95,7 @@ module ValidationsHelper
     get_release_project
     get_project_user
 
-    validate_authorization
+    validate_user_authorization
   end
 
   def validate_sprint_story(story_id)
